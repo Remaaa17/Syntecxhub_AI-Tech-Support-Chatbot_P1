@@ -133,16 +133,28 @@ function addMessage(text, sender, metadata = {}) {
         const metaDiv = document.createElement('div');
         metaDiv.className = 'message-meta';
         
+        // Sentiment badge
+        const sentimentLabel = metadata.sentiment.label || 'neutral';
         const sentimentBadge = document.createElement('span');
-        sentimentBadge.className = `sentiment-badge sentiment-${metadata.sentiment.label}`;
-        sentimentBadge.textContent = metadata.sentiment.label;
-        
+        sentimentBadge.className = `meta-badge sentiment-${sentimentLabel}`;
+        sentimentBadge.textContent = sentimentLabel.toUpperCase();
         metaDiv.appendChild(sentimentBadge);
         
-        if (metadata.intent) {
-            const intentSpan = document.createElement('span');
-            intentSpan.textContent = `Intent: ${metadata.intent}`;
-            metaDiv.appendChild(intentSpan);
+        // Intent badge
+        if (metadata.intent && metadata.intent !== 'unknown') {
+            const intentBadge = document.createElement('span');
+            intentBadge.className = 'meta-badge';
+            intentBadge.textContent = `Intent: ${metadata.intent.replace('_', ' ')}`;
+            metaDiv.appendChild(intentBadge);
+        }
+        
+        // Confidence badge
+        if (metadata.confidence) {
+            const confidenceBadge = document.createElement('span');
+            confidenceBadge.className = 'meta-badge';
+            const confPercent = Math.round(metadata.confidence * 100);
+            confidenceBadge.textContent = `${confPercent}% confidence`;
+            metaDiv.appendChild(confidenceBadge);
         }
         
         contentDiv.appendChild(metaDiv);
