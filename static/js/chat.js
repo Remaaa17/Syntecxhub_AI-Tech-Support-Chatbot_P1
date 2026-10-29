@@ -3,6 +3,14 @@
 const API_BASE = '/api';
 let userId = 'user_' + Math.random().toString(36).substr(2, 9);
 let isRecording = false;
+let conversationData = {
+    messages: [],
+    sentiments: { positive: 0, negative: 0, neutral: 0 },
+    intents: {},
+    totalMessages: 0,
+    resolvedIssues: 0
+};
+let charts = {};
 
 // DOM Elements
 const chatMessages = document.getElementById('chatMessages');
@@ -19,8 +27,53 @@ const toast = document.getElementById('toast');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
+    setupNavigation();
     messageInput.focus();
+    initializeCharts();
 });
+
+// Navigation Setup
+function setupNavigation() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = link.getAttribute('data-page');
+            switchView(page);
+            
+            // Update active state
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        });
+    });
+}
+
+function switchView(viewName) {
+    // Hide all views
+    const views = ['chatView', 'ticketsView', 'analyticsView', 'historyView', 'settingsView'];
+    views.forEach(view => {
+        const element = document.getElementById(view);
+        if (element) {
+            element.classList.add('hidden');
+        }
+    });
+    
+    // Show selected view
+    const selectedView = document.getElementById(viewName);
+    if (selectedView) {
+        selectedView.classList.remove('hidden');
+        
+        // Load view-specific content
+        if (viewName === 'analyticsView') {
+            loadAnalytics();
+        } else if (viewName === 'historyView') {
+            loadHistory();
+        } else if (viewName === 'ticketsView') {
+            loadTickets();
+        }
+    }
+}
 
 // Event Listeners
 function setupEventListeners() {
@@ -28,8 +81,17 @@ function setupEventListeners() {
     messageInput.addEventListener('keydown', handleKeyPress);
     voiceBtn.addEventListener('click', toggleVoiceInput);
     clearBtn.addEventListener('click', clearChat);
-    analyticsBtn.addEventListener('click', showAnalytics);
+    analyticsBtn.addEventListener('click', () => switchView('analyticsView'));
     exportBtn.addEventListener('click', showExport);
+    
+    // Also setup analytics button in nav
+    const analyticsNavBtn = document.getElementById('analyticsNavBtn');
+    if (analyticsNavBtn) {
+        analyticsNavBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchView('analyticsView');
+        });
+    }
     
     // Auto-resize textarea
     messageInput.addEventListener('input', () => {
@@ -45,7 +107,7 @@ function handleKeyPress(e) {
     }
 }
 
-// Send Message
+// Send Message with improved accuracy
 async function sendMessage() {
     const message = messageInput.value.trim();
     
@@ -78,11 +140,35 @@ async function sendMessage() {
         removeTypingIndicator(typingId);
         
         if (response.ok) {
+            // Update conversation data
+            conversationData.totalMessages += 2;
+            const sentimentLabel = data.sentiment?.label || 'neutral';
+            conversationData.sentiments[sentimentLabel]++;
+            
+            const intent = data.intent || 'unknown';
+            conversationData.intents[intent] = (conversationData.intents[intent] || 0) + 1;
+            
+            if (data.confidence > 0.7) {
+                conversationData.resolvedIssues++;
+            }
+            
+            // Store message
+            conversationData.messages.push({
+                user: message,
+                bot: data.response,
+                sentiment: data.sentiment,
+                intent: data.intent,
+                confidence: data.confidence,
+                source: data.source,
+                timestamp: new Date().toISOString()
+            });
+            
             // Add bot response
             addMessage(data.response, 'bot', {
                 sentiment: data.sentiment,
                 intent: data.intent,
-                confidence: data.confidence
+                confidence: data.confidence,
+                source: data.source
             });
         } else {
             showToast('Error: ' + (data.error || 'Failed to get response'), 'error');
@@ -95,7 +181,7 @@ async function sendMessage() {
     }
 }
 
-// Add Message to Chat
+// Add Message to Chat with metadata
 function addMessage(text, sender, metadata = {}) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
@@ -418,3 +504,252 @@ window.onclick = (event) => {
         closeExport();
     }
 };
+
+// Analytics Dashboard Functions
+function initializeCharts() {
+    // Initialize Chart.js defaults
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        Chart.defaults.color = '#808080';
+    }
+}
+
+function loadAnalytics() {
+    updateAnalyticsStats();
+    createSentimentChart();
+    createIssuesChart();
+    createTimelineChart();
+}
+
+function updateAnalyticsStats() {
+    document.getElementById('totalMessages').textContent = conversationData.totalMessages;
+    document.getElementById('resolvedIssues').textContent = conversationData.resolvedIssues;
+    
+    // Calculate average sentiment
+    const total = conversationData.sentiments.positive + conversationData.sentiments.negative + conversationData.sentiments.neutral;
+    let avgSentiment = 'Neutral';
+    if (total > 0) {
+        if (conversationData.sentiments.positive > conversationData.sentiments.negative) {
+            avgSentiment = 'Positive';
+        } else if (conversationData.sentiments.negative > conversationData.sentiments.positive) {
+            avgSentiment = 'Negative';
+        }
+    }
+    document.getElementById('avgSentiment').textContent = avgSentiment;
+}
+
+function createSentimentChart() {
+    const ctx = document.getElementById('sentimentChart');
+    if (!ctx) return;
+    
+    if (charts.sentiment) {
+        charts.sentiment.destroy();
+    }
+    
+    charts.sentiment = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Positive', 'Negative', 'Neutral'],
+            datasets: [{
+                data: [
+                    conversationData.sentiments.positive,
+                    conversationData.sentiments.negative,
+                    conversationData.sentiments.neutral
+                ],
+                backgroundColor: ['#10b981', '#ef4444', '#808080'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createIssuesChart() {
+    const ctx = document.getElementById('issuesChart');
+    if (!ctx) return;
+    
+    if (charts.issues) {
+        charts.issues.destroy();
+    }
+    
+    const intents = Object.entries(conversationData.intents)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    charts.issues = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: intents.map(i => i[0].replace('_', ' ')),
+            datasets: [{
+                label: 'Count',
+                data: intents.map(i => i[1]),
+                backgroundColor: '#1736F5',
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+}
+
+function createTimelineChart() {
+    const ctx = document.getElementById('timelineChart');
+    if (!ctx) return;
+    
+    if (charts.timeline) {
+        charts.timeline.destroy();
+    }
+    
+    // Group messages by time (last 10 messages)
+    const timeLabels = conversationData.messages.slice(-10).map((msg, idx) => `Msg ${idx + 1}`);
+    const timeData = conversationData.messages.slice(-10).map(() => 1);
+    
+    charts.timeline = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                label: 'Messages',
+                data: timeData,
+                borderColor: '#1736F5',
+                backgroundColor: 'rgba(23, 54, 245, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+}
+
+function refreshAnalytics() {
+    loadAnalytics();
+    showToast('Analytics refreshed', 'success');
+}
+
+// History Functions
+function loadHistory() {
+    const historyList = document.getElementById('historyList');
+    if (!historyList) return;
+    
+    if (conversationData.messages.length === 0) {
+        historyList.innerHTML = `
+            <div class="empty-state">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="#DEDEDE">
+                    <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                </svg>
+                <h3>No History Yet</h3>
+                <p>Your conversation history will appear here</p>
+            </div>
+        `;
+        return;
+    }
+    
+    historyList.innerHTML = '';
+    
+    conversationData.messages.forEach((msg, idx) => {
+        const date = new Date(msg.timestamp);
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+            <div class="history-item-header">
+                <span class="history-date">Conversation #${idx + 1}</span>
+                <span class="history-time">${date.toLocaleTimeString()}</span>
+            </div>
+            <div class="history-preview">
+                <strong>You:</strong> ${msg.user}<br>
+                <strong>Bot:</strong> ${msg.bot.substring(0, 100)}${msg.bot.length > 100 ? '...' : ''}
+            </div>
+        `;
+        historyList.appendChild(historyItem);
+    });
+}
+
+function clearAllHistory() {
+    if (!confirm('Clear all conversation history?')) return;
+    
+    conversationData.messages = [];
+    conversationData.sentiments = { positive: 0, negative: 0, neutral: 0 };
+    conversationData.intents = {};
+    conversationData.totalMessages = 0;
+    conversationData.resolvedIssues = 0;
+    
+    loadHistory();
+    showToast('History cleared', 'success');
+}
+
+// Tickets Functions
+function loadTickets() {
+    const ticketsGrid = document.getElementById('ticketsGrid');
+    if (!ticketsGrid) return;
+    
+    // For now, show empty state
+    // In production, this would load from backend
+    ticketsGrid.innerHTML = `
+        <div class="empty-state">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="#DEDEDE">
+                <path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/>
+            </svg>
+            <h3>No Tickets Yet</h3>
+            <p>Create your first support ticket to get started</p>
+        </div>
+    `;
+}
+
+function createNewTicket() {
+    showToast('Ticket creation coming soon!', 'info');
+}
+
+// Settings Functions
+function saveSettings() {
+    const language = document.getElementById('languageSetting').value;
+    const sound = document.getElementById('soundSetting').checked;
+    const voice = document.getElementById('voiceEnabled').checked;
+    const context = document.getElementById('contextMemory').checked;
+    const aiEnabled = document.getElementById('aiEnabled').checked;
+    
+    // Save to localStorage
+    localStorage.setItem('settings', JSON.stringify({
+        language,
+        sound,
+        voice,
+        context,
+        aiEnabled
+    }));
+    
+    showToast('Settings saved successfully', 'success');
+}

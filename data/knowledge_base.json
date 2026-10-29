@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "question": "How do I install Python?",
+    "answer": "To install Python:\n1. Go to python.org/downloads\n2. Download the latest version for your OS\n3. Run the installer\n4. Check 'Add Python to PATH'\n5. Click 'Install Now'\n6. Verify installation: Open terminal and type 'python --version'",
+    "keywords": ["install", "python", "setup", "download"],
+    "category": "installation"
+  },
+  {
+    "id": 2,
+    "question": "My WiFi is not working",
+    "answer": "To fix WiFi issues:\n1. Restart your router (unplug for 30 seconds)\n2. Check if WiFi is enabled on your device\n3. Forget the network and reconnect\n4. Update network drivers\n5. Run Network Troubleshooter (Windows)\n6. Check if other devices can connect\n7. Contact ISP if problem persists",
+    "keywords": ["wifi", "wireless", "internet", "connection", "network"],
+    "category": "network"
+  },
+  {
+    "id": 3,
+    "question": "Computer is running slow",
+    "answer": "To improve computer performance:\n1. Close unnecessary programs\n2. Check Task Manager for high CPU/memory usage\n3. Disable startup programs\n4. Run Disk Cleanup\n5. Check for malware with antivirus\n6. Update drivers\n7. Add more RAM if needed\n8. Consider upgrading to SSD\n9. Check for Windows updates",
+    "keywords": ["slow", "performance", "lag", "freeze", "speed"],
+    "category": "performance"
+  },
+  {
+    "id": 4,
+    "question": "I forgot my password",
+    "answer": "To recover your password:\n1. Click 'Forgot Password' on login page\n2. Enter your email address\n3. Check your email for reset link\n4. Click the link and create new password\n5. Use password manager to avoid forgetting\n\nIf you don't receive email:\n- Check spam folder\n- Verify correct email address\n- Contact support for manual reset",
+    "keywords": ["password", "forgot", "reset", "login", "access"],
+    "category": "security"
+  },
+  {
+    "id": 5,
+    "question": "How to fix 404 error?",
+    "answer": "404 Error means 'Page Not Found'. Solutions:\n1. Check the URL for typos\n2. Refresh the page (F5)\n3. Clear browser cache and cookies\n4. Try searching from homepage\n5. Check if website is down (use downdetector.com)\n\nFor website owners:\n- Verify file exists on server\n- Check .htaccess rules\n- Update broken links\n- Create custom 404 page",
+    "keywords": ["404", "error", "not found", "page", "website"],
+    "category": "web"
+  },
+  {
+    "id": 6,
+    "question": "How to install Node.js?",
+    "answer": "To install Node.js:\n1. Visit nodejs.org\n2. Download LTS version (recommended)\n3. Run installer\n4. Follow installation wizard\n5. Verify installation: Open terminal\n   - Type 'node --version'\n   - Type 'npm --version'\n\nBoth commands should return version numbers.",
+    "keywords": ["node", "nodejs", "npm", "install", "javascript"],
+    "category": "installation"
+  },
+  {
+    "id": 7,
+    "question": "What is an IP address?",
+    "answer": "IP Address (Internet Protocol Address) is a unique numerical label assigned to each device connected to a network.\n\nTypes:\n- IPv4: 192.168.1.1 (most common)\n- IPv6: 2001:0db8:85a3::8a2e:0370:7334 (newer)\n\nTo find your IP:\nWindows: Open CMD, type 'ipconfig'\nmacOS/Linux: Open Terminal, type 'ifconfig' or 'ip addr'\n\nPublic IP: Your network's address on internet\nPrivate IP: Your device's address on local network",
+    "keywords": ["ip", "address", "network", "ipconfig", "tcp"],
+    "category": "network"
+  },
+  {
+    "id": 8,
+    "question": "How to update drivers?",
+    "answer": "To update drivers:\n\nWindows:\n1. Open Device Manager (Win + X)\n2. Find the device\n3. Right-click > Update driver\n4. Search automatically for drivers\n\nOr visit manufacturer's website:\n1. Find your device model\n2. Go to Support/Downloads section\n3. Download latest driver\n4. Install manually\n\nRecommended: Use Windows Update for automatic driver updates",
+    "keywords": ["driver", "update", "device", "hardware"],
+    "category": "system"
+  },
+  {
+    "id": 9,
+    "question": "How to clear browser cache?",
+    "answer": "To clear browser cache:\n\nChrome/Edge:\n1. Press Ctrl + Shift + Delete\n2. Select 'All time' for time range\n3. Check 'Cached images and files'\n4. Click 'Clear data'\n\nFirefox:\n1. Press Ctrl + Shift + Delete\n2. Select time range\n3. Check 'Cache'\n4. Click 'Clear Now'\n\nSafari:\n1. Safari menu > Preferences\n2. Advanced tab\n3. Show Develop menu\n4. Develop > Empty Caches",
+    "keywords": ["cache", "clear", "browser", "cookies", "data"],
+    "category": "web"
+  },
+  {
+    "id": 10,
+    "question": "What is RAM?",
+    "answer": "RAM (Random Access Memory) is your computer's short-term memory.\n\nKey Points:\n- Stores data currently in use\n- Faster than hard drive/SSD\n- Volatile (loses data when powered off)\n- More RAM = better multitasking\n\nTypical amounts:\n- 4GB: Basic tasks\n- 8GB: General use (recommended)\n- 16GB: Gaming, video editing\n- 32GB+: Professional workstations\n\nTo check RAM:\nWindows: Task Manager > Performance > Memory\nmacOS: About This Mac > Memory",
+    "keywords": ["ram", "memory", "computer", "hardware", "performance"],
+    "category": "hardware"
+  },
+  {
+    "id": 11,
+    "question": "How to backup data?",
+    "answer": "Data backup methods:\n\n1. Cloud Backup:\n   - Google Drive, OneDrive, Dropbox\n   - Automatic sync\n   - Accessible anywhere\n\n2. External Drive:\n   - USB hard drive/SSD\n   - Manual or scheduled backups\n   - Full control\n\n3. Windows Backup:\n   - Settings > Update & Security > Backup\n   - File History for continuous backup\n\n4. macOS Time Machine:\n   - System Preferences > Time Machine\n   - Automatic hourly backups\n\nFollow 3-2-1 Rule:\n- 3 copies of data\n- 2 different media types\n- 1 offsite backup",
+    "keywords": ["backup", "data", "save", "restore", "recovery"],
+    "category": "data"
+  },
+  {
+    "id": 12,
+    "question": "How to fix blue screen of death?",
+    "answer": "Blue Screen of Death (BSOD) fixes:\n\n1. Note the error code shown\n2. Restart computer\n3. Update Windows and drivers\n4. Run System File Checker:\n   - Open CMD as admin\n   - Type 'sfc /scannow'\n5. Check for hardware issues:\n   - Reseat RAM\n   - Check hard drive health\n6. Uninstall recent software/updates\n7. Boot in Safe Mode to troubleshoot\n8. Check Event Viewer for details\n9. Run Memory Diagnostic tool\n\nCommon causes:\n- Faulty RAM\n- Driver conflicts\n- Corrupted system files\n- Hardware failure",
+    "keywords": ["bsod", "blue screen", "crash", "windows", "error"],
+    "category": "system"
+  },
+  {
+    "id": 13,
+    "question": "What is an SSD?",
+    "answer": "SSD (Solid State Drive) is a storage device with no moving parts.\n\nAdvantages over HDD:\n- Much faster (3-5x)\n- More durable\n- Silent operation\n- Less power consumption\n- Better for laptops\n\nDisadvantages:\n- More expensive per GB\n- Limited write cycles (though this is rarely an issue)\n\nTypes:\n- SATA SSD: Up to 550MB/s\n- NVMe SSD: Up to 7000MB/s (fastest)\n\nRecommended for:\n- Operating system\n- Applications\n- Games\n\nUse HDD for:\n- Large file storage\n- Backup archives",
+    "keywords": ["ssd", "hard drive", "storage", "disk", "nvme"],
+    "category": "hardware"
+  },
+  {
+    "id": 14,
+    "question": "How to secure my computer?",
+    "answer": "Computer security best practices:\n\n1. Software:\n   - Install antivirus software\n   - Enable Windows Defender/Firewall\n   - Keep OS and apps updated\n   - Use strong, unique passwords\n   - Enable 2FA where possible\n\n2. Browsing:\n   - Use HTTPS websites\n   - Don't click suspicious links\n   - Be careful with downloads\n   - Use ad blocker\n\n3. Network:\n   - Use strong WiFi password\n   - Avoid public WiFi for sensitive tasks\n   - Consider VPN\n\n4. Data:\n   - Regular backups\n   - Encrypt sensitive files\n   - Don't share personal info online\n\n5. Physical:\n   - Lock screen when away\n   - Use device passwords\n   - Secure physical access",
+    "keywords": ["security", "antivirus", "protect", "safe", "malware"],
+    "category": "security"
+  },
+  {
+    "id": 15,
+    "question": "What is Git?",
+    "answer": "Git is a version control system for tracking code changes.\n\nKey Concepts:\n- Repository: Project folder\n- Commit: Saved snapshot\n- Branch: Separate line of development\n- Merge: Combine branches\n- Push/Pull: Sync with remote\n\nBasic Commands:\n- git init: Create repository\n- git add: Stage files\n- git commit: Save changes\n- git push: Upload to remote\n- git pull: Download from remote\n- git clone: Copy repository\n\nPopular Services:\n- GitHub\n- GitLab\n- Bitbucket\n\nBenefits:\n- Track all changes\n- Collaborate with team\n- Undo mistakes\n- Branching for features",
+    "keywords": ["git", "version control", "github", "repository", "commit"],
+    "category": "development"
+  }
+]
