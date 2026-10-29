@@ -87,7 +87,12 @@ function setupEventListeners() {
     messageInput.addEventListener('keydown', handleKeyPress);
     voiceBtn.addEventListener('click', toggleVoiceInput);
     clearBtn.addEventListener('click', clearChat);
-    analyticsBtn.addEventListener('click', () => switchView('analyticsView'));
+    analyticsBtn.addEventListener('click', () => {
+        switchView('analyticsView');
+        // Update nav active state
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelector('[data-page="analytics"]').classList.add('active');
+    });
     exportBtn.addEventListener('click', showExport);
     
     // Also setup analytics button in nav
