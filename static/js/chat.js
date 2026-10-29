@@ -50,27 +50,33 @@ function setupNavigation() {
 }
 
 function switchView(viewName) {
-    // Hide all views
-    const views = ['chatView', 'ticketsView', 'analyticsView', 'historyView', 'settingsView'];
-    views.forEach(view => {
+    // Hide all content views
+    const contentViews = ['analyticsView', 'historyView', 'settingsView'];
+    contentViews.forEach(view => {
         const element = document.getElementById(view);
         if (element) {
             element.classList.add('hidden');
         }
     });
     
-    // Show selected view
-    const selectedView = document.getElementById(viewName);
-    if (selectedView) {
-        selectedView.classList.remove('hidden');
+    // Hide or show chat view
+    const chatView = document.getElementById('chatView');
+    if (viewName === 'chat') {
+        chatView.classList.remove('hidden');
+    } else {
+        chatView.classList.add('hidden');
         
-        // Load view-specific content
-        if (viewName === 'analyticsView') {
-            loadAnalytics();
-        } else if (viewName === 'historyView') {
-            loadHistory();
-        } else if (viewName === 'ticketsView') {
-            loadTickets();
+        // Show selected view
+        const selectedView = document.getElementById(viewName);
+        if (selectedView) {
+            selectedView.classList.remove('hidden');
+            
+            // Load view-specific content
+            if (viewName === 'analyticsView') {
+                loadAnalytics();
+            } else if (viewName === 'historyView') {
+                loadHistory();
+            }
         }
     }
 }
@@ -710,28 +716,6 @@ function clearAllHistory() {
     
     loadHistory();
     showToast('History cleared', 'success');
-}
-
-// Tickets Functions
-function loadTickets() {
-    const ticketsGrid = document.getElementById('ticketsGrid');
-    if (!ticketsGrid) return;
-    
-    // For now, show empty state
-    // In production, this would load from backend
-    ticketsGrid.innerHTML = `
-        <div class="empty-state">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="#DEDEDE">
-                <path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/>
-            </svg>
-            <h3>No Tickets Yet</h3>
-            <p>Create your first support ticket to get started</p>
-        </div>
-    `;
-}
-
-function createNewTicket() {
-    showToast('Ticket creation coming soon!', 'info');
 }
 
 // Settings Functions
