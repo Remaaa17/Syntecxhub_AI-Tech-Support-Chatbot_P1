@@ -22,7 +22,13 @@ class KnowledgeBase:
         if os.path.exists(kb_path):
             with open(kb_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                return data.get('knowledge', [])
+                # Handle both list and dict formats
+                if isinstance(data, list):
+                    return data
+                elif isinstance(data, dict):
+                    return data.get('knowledge', [])
+                else:
+                    return []
         else:
             return self._get_default_knowledge()
     
