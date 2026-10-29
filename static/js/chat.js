@@ -283,14 +283,60 @@ function addMessage(text, sender, metadata = {}) {
 }
 
 function formatMessageText(text) {
+    // Check if marked.js is available (for markdown rendering)
+    if (typeof marked !== 'undefined') {
+        try {
+            // Configure marked for better formatting
+            marked.setOptions({
+                breaks: true,  // Convert \n to <br>
+                gfm: true,     // GitHub Flavored Markdown (tables, etc.)
+                headerIds: false,
+                mangle: false,
+                sanitize: false
+            });
+            
+            // Parse markdown to HTML
+            let html = marked.parse(text);
+            
+            // Add custom styling classes to tables
+            html = html.replace(/<table>/g, '<table class="markdown-table">');
+            html = html.replace(/<code>/g, '<code class="inline-code">');
+            html = html.replace(/<pre>/g, '<pre class="code-block">');
+            
+            return html;
+            
+        } catch (e) {
+            console.error('Markdown parsing error:', e);
+            // Fallback to basic formatting
+            return formatBasicText(text);
+        }
+    } else {
+        // Fallback if marked.js not loaded
+        return formatBasicText(text);
+    }
+}
+
+function formatBasicText(text) {
+    // Basic text formatting without markdown library
+    let formatted = text;
+    
     // Convert newlines to <br>
-    let formatted = text.replace(/\n/g, '<br>');
+    formatted = formatted.replace(/\n/g, '<br>');
     
     // Convert numbered lists
     formatted = formatted.replace(/^(\d+)\.\s/gm, '<br>$1. ');
     
     // Convert bullet points
     formatted = formatted.replace(/^[-*]\s/gm, '<br>• ');
+    
+    // Bold text **text**
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Italic text *text*
+    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Inline code `code`
+    formatted = formatted.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
     
     return formatted;
 }
