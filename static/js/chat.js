@@ -684,7 +684,7 @@ function loadHistory() {
                     <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
                 </svg>
                 <h3>No History Yet</h3>
-                <p>Your conversation history will appear here</p>
+                <p>Start a conversation and your history will appear here</p>
             </div>
         `;
         return;
@@ -694,20 +694,100 @@ function loadHistory() {
     
     conversationData.messages.forEach((msg, idx) => {
         const date = new Date(msg.timestamp);
+        const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        
         const historyItem = document.createElement('div');
         historyItem.className = 'history-item';
+        
+        // Sentiment color
+        const sentimentLabel = msg.sentiment?.label || 'neutral';
+        let sentimentColor = '#808080';
+        if (sentimentLabel === 'positive') sentimentColor = '#10b981';
+        if (sentimentLabel === 'negative') sentimentColor = '#ef4444';
+        
         historyItem.innerHTML = `
             <div class="history-item-header">
-                <span class="history-date">Conversation #${idx + 1}</span>
-                <span class="history-time">${date.toLocaleTimeString()}</span>
+                <div class="history-meta">
+                    <span class="history-number">#${idx + 1}</span>
+                    <span class="history-date">${dateStr}</span>
+                    <span class="history-time">${timeStr}</span>
+                </div>
+                <span class="history-badge" style="background: ${sentimentColor}20; color: ${sentimentColor};">
+                    ${sentimentLabel}
+                </span>
             </div>
-            <div class="history-preview">
-                <strong>You:</strong> ${msg.user}<br>
-                <strong>Bot:</strong> ${msg.bot.substring(0, 100)}${msg.bot.length > 100 ? '...' : ''}
+            <div class="history-content">
+                <div class="history-question">
+                    <strong>You:</strong> ${escapeHtml(msg.user)}
+                </div>
+                <div class="history-answer">
+                    <strong>Assistant:</strong> ${escapeHtml(msg.bot.substring(0, 150))}${msg.bot.length > 150 ? '...' : ''}
+                </div>
+                <div class="history-details">
+                    <span class="detail-badge">Intent: ${msg.intent || 'unknown'}</span>
+                    <span class="detail-badge">Confidence: ${Math.round((msg.confidence || 0) * 100)}%</span>
+                    <span class="detail-badge">Source: ${msg.source || 'unknown'}</span>
+                </div>
             </div>
         `;
+        
+        // Click to view full conversation
+        historyItem.addEventListener('click', () => {
+            showConversationDetail(msg, idx + 1);
+        });
+        
         historyList.appendChild(historyItem);
     });
+}
+
+function showConversationDetail(msg, number) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Conversation #${number}</h2>
+                <button class="modal-close" onclick="this.closest('.modal').remove()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="conversation-detail">
+                    <div class="detail-section">
+                        <h4>Your Question:</h4>
+                        <p>${escapeHtml(msg.user)}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Assistant's Response:</h4>
+                        <p>${escapeHtml(msg.bot)}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Metadata:</h4>
+                        <ul>
+                            <li><strong>Timestamp:</strong> ${new Date(msg.timestamp).toLocaleString()}</li>
+                            <li><strong>Sentiment:</strong> ${msg.sentiment?.label || 'N/A'}</li>
+                            <li><strong>Intent:</strong> ${msg.intent || 'N/A'}</li>
+                            <li><strong>Confidence:</strong> ${Math.round((msg.confidence || 0) * 100)}%</li>
+                            <li><strong>Source:</strong> ${msg.source || 'N/A'}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Close on outside click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function clearAllHistory() {
