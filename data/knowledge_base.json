@@ -70,6 +70,13 @@
     "category": "hardware"
   },
   {
+    "id": 10.5,
+    "question": "What is ROM?",
+    "answer": "ROM (Read-Only Memory) is permanent storage that retains data even when powered off.\n\nKey Points:\n- Pre-installed by manufacturer\n- Contains firmware and boot instructions\n- Cannot be easily modified\n- Non-volatile (keeps data without power)\n\nTypes:\n- BIOS/UEFI: Boot firmware\n- Firmware: Device-specific instructions\n- ROM chips: Embedded systems\n\nDifference from RAM:\n- RAM: Temporary, fast, writable\n- ROM: Permanent, slower, read-only\n\nCommon uses:\n- Computer BIOS\n- Game cartridges\n- Embedded devices\n- Bootloaders",
+    "keywords": ["rom", "read only memory", "firmware", "bios"],
+    "category": "hardware"
+  },
+  {
     "id": 11,
     "question": "How to backup data?",
     "answer": "Data backup methods:\n\n1. Cloud Backup:\n   - Google Drive, OneDrive, Dropbox\n   - Automatic sync\n   - Accessible anywhere\n\n2. External Drive:\n   - USB hard drive/SSD\n   - Manual or scheduled backups\n   - Full control\n\n3. Windows Backup:\n   - Settings > Update & Security > Backup\n   - File History for continuous backup\n\n4. macOS Time Machine:\n   - System Preferences > Time Machine\n   - Automatic hourly backups\n\nFollow 3-2-1 Rule:\n- 3 copies of data\n- 2 different media types\n- 1 offsite backup",

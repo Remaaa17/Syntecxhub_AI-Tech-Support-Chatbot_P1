@@ -160,12 +160,16 @@ class KnowledgeBase:
             query_words = set(query.split())
             for keyword in item['keywords']:
                 keyword_words = set(keyword.lower().split())
+                
+                # Check for exact word matches (not partial)
                 if query_words & keyword_words:  # Intersection
                     keyword_score = len(query_words & keyword_words) / len(keyword_words)
                     score = max(score, keyword_score)
                 
-                # Check if keyword phrase is in query
-                if keyword.lower() in query:
+                # Check if whole keyword phrase is in query (with word boundaries)
+                import re
+                pattern = r'\b' + re.escape(keyword.lower()) + r'\b'
+                if re.search(pattern, query):
                     score = max(score, 0.9)
             
             if score > best_score:
