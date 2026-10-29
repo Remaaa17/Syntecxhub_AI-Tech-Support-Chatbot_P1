@@ -14,6 +14,7 @@ from .sentiment_analyzer import SentimentAnalyzer
 from .context_manager import ContextManager
 from .language_handler import LanguageHandler
 from .learning_system import LearningSystem
+from .ai_fallback import AIFallback
 
 
 class ChatbotEngine:
@@ -27,6 +28,7 @@ class ChatbotEngine:
         self.context_manager = ContextManager()
         self.language_handler = LanguageHandler()
         self.learning_system = LearningSystem()
+        self.ai_fallback = AIFallback()
         
         self.conversation_count = 0
         self.start_time = datetime.now()
@@ -99,7 +101,16 @@ class ChatbotEngine:
                 response_source = "learned"
                 confidence = learned_response['confidence']
         
-        # 4. Fallback to default response
+        # 4. Try AI fallback for unknown questions
+        if not response_text:
+            print(f"[INFO] Using AI fallback for: {message_en[:50]}...")
+            ai_result = self.ai_fallback.get_ai_response(message_en)
+            if ai_result and ai_result['answer']:
+                response_text = ai_result['answer']
+                response_source = ai_result['source']
+                confidence = ai_result['confidence']
+        
+        # 5. Fallback to default response
         if not response_text:
             response_text = self._get_fallback_response(sentiment)
             response_source = "fallback"

@@ -4,8 +4,12 @@ Flask Web Application for Tech Support Chatbot
 
 from flask import Flask, render_template, request, jsonify, send_file
 from flask_cors import CORS
+from dotenv import load_dotenv
 import os
 import sys
+
+# Load environment variables
+load_dotenv()
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))

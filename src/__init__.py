@@ -12,6 +12,7 @@ from .voice_handler import VoiceHandler
 from .learning_system import LearningSystem
 from .analytics_engine import AnalyticsEngine
 from .export_manager import ExportManager
+from .ai_fallback import AIFallback
 
 __all__ = [
     'ChatbotEngine',
@@ -23,7 +24,8 @@ __all__ = [
     'VoiceHandler',
     'LearningSystem',
     'AnalyticsEngine',
-    'ExportManager'
+    'ExportManager',
+    'AIFallback'
 ]
 
 __version__ = '1.0.0'
