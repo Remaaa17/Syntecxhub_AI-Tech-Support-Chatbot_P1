@@ -283,60 +283,44 @@ function addMessage(text, sender, metadata = {}) {
 }
 
 function formatMessageText(text) {
-    // Check if marked.js is available (for markdown rendering)
-    if (typeof marked !== 'undefined') {
-        try {
-            // Configure marked for better formatting
-            marked.setOptions({
-                breaks: true,  // Convert \n to <br>
-                gfm: true,     // GitHub Flavored Markdown (tables, etc.)
-                headerIds: false,
-                mangle: false,
-                sanitize: false
-            });
-            
-            // Parse markdown to HTML
-            let html = marked.parse(text);
-            
-            // Add custom styling classes to tables
-            html = html.replace(/<table>/g, '<table class="markdown-table">');
-            html = html.replace(/<code>/g, '<code class="inline-code">');
-            html = html.replace(/<pre>/g, '<pre class="code-block">');
-            
-            return html;
-            
-        } catch (e) {
-            console.error('Markdown parsing error:', e);
-            // Fallback to basic formatting
-            return formatBasicText(text);
-        }
-    } else {
-        // Fallback if marked.js not loaded
-        return formatBasicText(text);
-    }
+    // Use basic text formatting (no markdown rendering for AI responses)
+    return formatBasicText(text);
 }
 
 function formatBasicText(text) {
-    // Basic text formatting without markdown library
+    // Basic text formatting with clean appearance
     let formatted = text;
     
     // Convert newlines to <br>
     formatted = formatted.replace(/\n/g, '<br>');
     
-    // Convert numbered lists
+    // Convert numbered lists (but keep them clean)
     formatted = formatted.replace(/^(\d+)\.\s/gm, '<br>$1. ');
     
-    // Convert bullet points
-    formatted = formatted.replace(/^[-*]\s/gm, '<br>• ');
+    // Convert bullet points  
+    formatted = formatted.replace(/^[-•]\s/gm, '<br>• ');
     
-    // Bold text **text**
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Clean up any markdown symbols that might slip through
+    // Remove bold markers **text** but keep the text
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     
-    // Italic text *text*
-    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Remove italic markers *text* but keep the text
+    formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
     
-    // Inline code `code`
+    // Remove header markers # but keep the text as bold
+    formatted = formatted.replace(/^#{1,6}\s+(.+)$/gm, '<strong>$1</strong><br>');
+    
+    // Remove table pipes and format as clean lines
+    formatted = formatted.replace(/\|/g, ' ');
+    
+    // Remove horizontal rules
+    formatted = formatted.replace(/^[-=]{3,}$/gm, '<br>');
+    
+    // Inline code `code` - keep simple
     formatted = formatted.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+    
+    // Clean up multiple consecutive <br> tags
+    formatted = formatted.replace(/(<br>\s*){3,}/g, '<br><br>');
     
     return formatted;
 }

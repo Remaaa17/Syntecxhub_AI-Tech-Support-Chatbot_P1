@@ -79,8 +79,17 @@ class AIFallback:
 - Hardware compatibility
 - Operating system issues
 
+IMPORTANT FORMATTING RULES:
+- Do NOT use markdown symbols (*, #, |, -, etc.)
+- Do NOT use tables with pipes (|)
+- Use plain text only
+- Use clear headings on separate lines
+- Use bullet points with simple dashes or numbers
+- Use line breaks to separate sections
+- Keep formatting clean and readable
+
 Provide clear, accurate, and helpful technical support. Use step-by-step instructions when appropriate.
-Be concise but thorough. If you need more information, ask clarifying questions."""
+Be concise but thorough. Format responses in plain text without markdown."""
         
         if context:
             system_prompt += f"\n\nConversation Context: {context}"

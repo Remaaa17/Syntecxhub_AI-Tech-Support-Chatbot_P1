@@ -127,7 +127,7 @@ class KnowledgeBase:
             }
         ]
     
-    def search(self, query: str, threshold: float = 0.6) -> Optional[Dict]:
+    def search(self, query: str, threshold: float = 0.75) -> Optional[Dict]:
         """
         Search knowledge base for relevant answer
         
