@@ -12,16 +12,18 @@ class AIFallback:
     
     def __init__(self):
         """Initialize AI fallback with Groq API"""
-        # Using Groq API with Qwen 2.5 Coder model
+        # Using Groq API with GPT-OSS 120B (flagship model with 120B parameters)
         self.api_url = "https://api.groq.com/openai/v1/chat/completions"
         self.api_key = os.getenv('GROQ_API_KEY', '')  # Load from environment variable
-        self.model = "qwen/qwen2.5-coder-32b-instruct"
+        self.model = "openai/gpt-oss-120b"  # Current production flagship model
         self.enabled = bool(self.api_key)  # Only enable if API key is set
         self.max_tokens = 1200
         self.temperature = 0.7
         
         if not self.api_key:
             print("[WARNING] GROQ_API_KEY not set. AI fallback disabled. Set it in .env file.")
+        else:
+            print(f"[OK] AI Fallback initialized with model: {self.model}")
         
     def get_ai_response(self, question: str, context: str = "") -> Optional[Dict]:
         """
@@ -35,7 +37,10 @@ class AIFallback:
             Dictionary with response and metadata, or None if failed
         """
         if not self.enabled:
+            print(f"[WARNING] AI fallback disabled. API key not set.")
             return None
+        
+        print(f"[INFO] AI Fallback enabled. Calling Groq API...")
         
         try:
             # Format prompt for tech support
@@ -45,18 +50,20 @@ class AIFallback:
             response = self._call_groq_api(system_prompt, question)
             
             if response:
+                print(f"[INFO] Groq API success: {len(response)} characters")
                 return {
                     'answer': response,
                     'source': 'ai_fallback_groq',
                     'confidence': 0.85,
-                    'model': 'qwen2.5-coder-32b'
+                    'model': 'gpt-oss-120b'
                 }
             
+            print(f"[WARNING] Groq API returned empty response. Using simple fallback.")
             # Fallback to simple response
             return self._get_simple_fallback(question)
             
         except Exception as e:
-            print(f"[WARNING] AI Fallback error: {e}")
+            print(f"[ERROR] AI Fallback exception: {e}")
             return self._get_simple_fallback(question)
     
     def _get_system_prompt(self, context: str = "") -> str:
@@ -105,6 +112,8 @@ Be concise but thorough. If you need more information, ask clarifying questions.
                 "max_tokens": self.max_tokens
             }
             
+            print(f"[INFO] Calling Groq API with model: {self.model}")
+            
             response = requests.post(
                 self.api_url,
                 headers=headers,
@@ -112,22 +121,29 @@ Be concise but thorough. If you need more information, ask clarifying questions.
                 timeout=15
             )
             
+            print(f"[INFO] Groq API status: {response.status_code}")
+            
             if response.status_code == 200:
                 result = response.json()
                 if 'choices' in result and len(result['choices']) > 0:
                     message = result['choices'][0].get('message', {})
                     content = message.get('content', '')
-                    return self._clean_response(content)
+                    cleaned = self._clean_response(content)
+                    if cleaned:
+                        return cleaned
+                    else:
+                        print(f"[WARNING] Response too short after cleaning")
             else:
-                print(f"[WARNING] Groq API error: {response.status_code} - {response.text}")
+                error_text = response.text[:200]
+                print(f"[ERROR] Groq API error {response.status_code}: {error_text}")
             
             return None
             
         except requests.exceptions.Timeout:
-            print("[WARNING] Groq API timeout")
+            print("[ERROR] Groq API timeout after 15 seconds")
             return None
         except Exception as e:
-            print(f"[WARNING] Groq API error: {e}")
+            print(f"[ERROR] Groq API exception: {type(e).__name__}: {str(e)}")
             return None
     
     def _clean_response(self, text: str) -> str:
@@ -196,25 +212,28 @@ Be concise but thorough. If you need more information, ask clarifying questions.
         self.model = model
 
 
-# Available Groq Models:
+# Available Groq Models (October 2026):
 """
-1. qwen/qwen2.5-coder-32b-instruct (Current)
-   - Best for coding and technical questions
-   - 32B parameters
-   - Fast and accurate
+Current Production Models:
 
-2. llama-3.3-70b-versatile
-   - General purpose
-   - Very capable
-   - Good for complex questions
+1. openai/gpt-oss-120b (CURRENT - Flagship)
+   - 120B parameters
+   - Built-in browser search and code execution
+   - Best reasoning capabilities
+   
+2. openai/gpt-oss-20b
+   - 20B parameters
+   - Faster, lighter alternative
 
-3. mixtral-8x7b-32768
-   - Large context window
-   - Good for long conversations
-   - Balanced performance
+3. qwen/qwen3.8-27b
+   - 27B parameters
+   - Qwen model family
 
-4. gemma2-9b-it
-   - Lightweight
-   - Fast responses
-   - Good for simple questions
+4. allam-2-7b
+   - 7B parameters
+   - Lightweight option
+
+Note: Many older models (llama3-8b-8192, llama-3.3-70b-versatile, etc.) 
+have been decommissioned. Check https://console.groq.com/docs/deprecations 
+for the latest model recommendations.
 """

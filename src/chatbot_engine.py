@@ -86,6 +86,9 @@ class ChatbotEngine:
                 response_text = kb_result['answer']
                 response_source = "knowledge_base"
                 confidence = kb_result['confidence']
+                print(f"[INFO] Knowledge base match: {confidence:.2f} confidence")
+            elif kb_result:
+                print(f"[INFO] KB found low confidence match ({kb_result['confidence']:.2f}), skipping for AI")
         
         # 2. Use intent-based response
         if not response_text and intent_result['confidence'] > 0.6:
@@ -103,12 +106,16 @@ class ChatbotEngine:
         
         # 4. Try AI fallback for unknown questions
         if not response_text:
-            print(f"[INFO] Using AI fallback for: {message_en[:50]}...")
-            ai_result = self.ai_fallback.get_ai_response(message_en)
-            if ai_result and ai_result['answer']:
+            context_str = self._get_context_string(user_id)
+            print(f"[INFO] No match found. Using AI fallback for: {message_en[:50]}...")
+            ai_result = self.ai_fallback.get_ai_response(message_en, context_str)
+            if ai_result and ai_result.get('answer'):
                 response_text = ai_result['answer']
-                response_source = ai_result['source']
-                confidence = ai_result['confidence']
+                response_source = ai_result.get('source', 'ai_fallback')
+                confidence = ai_result.get('confidence', 0.85)
+                print(f"[INFO] AI fallback successful: {len(response_text)} chars")
+            else:
+                print(f"[WARNING] AI fallback returned no response")
         
         # 5. Fallback to default response
         if not response_text:
@@ -233,6 +240,19 @@ class ChatbotEngine:
         minutes = int((seconds % 3600) // 60)
         secs = int(seconds % 60)
         return f"{hours}h {minutes}m {secs}s"
+    
+    def _get_context_string(self, user_id: str) -> str:
+        """Get conversation context as a string for AI"""
+        messages = self.context_manager.get_context(user_id, limit=5)
+        if not messages:
+            return ""
+        
+        context_parts = []
+        for msg in messages[-3:]:  # Last 3 messages
+            sender = "User" if msg['sender'] == 'user' else "Assistant"
+            context_parts.append(f"{sender}: {msg['message']}")
+        
+        return "\n".join(context_parts)
     
     def export_conversation(self, user_id: str, format: str = 'json') -> str:
         """Export conversation history"""
