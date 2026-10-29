@@ -40,44 +40,59 @@ function setupNavigation() {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const page = link.getAttribute('data-page');
-            switchView(page);
             
             // Update active state
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
+            
+            // Switch view
+            switchView(page);
         });
     });
 }
 
 function switchView(viewName) {
-    // Hide all content views
-    const contentViews = ['analyticsView', 'historyView', 'settingsView'];
-    contentViews.forEach(view => {
+    console.log('Switching to view:', viewName);
+    
+    // Map page names to view IDs
+    const viewMap = {
+        'chat': 'chatView',
+        'analytics': 'analyticsView',
+        'history': 'historyView',
+        'settings': 'settingsView'
+    };
+    
+    // Get the actual view ID
+    const viewId = viewMap[viewName] || viewName;
+    
+    // Hide all views
+    const allViews = ['chatView', 'analyticsView', 'historyView', 'settingsView'];
+    allViews.forEach(view => {
         const element = document.getElementById(view);
         if (element) {
             element.classList.add('hidden');
+            console.log('Hiding:', view);
         }
     });
     
-    // Hide or show chat view
-    const chatView = document.getElementById('chatView');
-    if (viewName === 'chat') {
-        chatView.classList.remove('hidden');
-    } else {
-        chatView.classList.add('hidden');
+    // Show selected view
+    const selectedView = document.getElementById(viewId);
+    if (selectedView) {
+        selectedView.classList.remove('hidden');
+        console.log('Showing view:', viewId);
         
-        // Show selected view
-        const selectedView = document.getElementById(viewName);
-        if (selectedView) {
-            selectedView.classList.remove('hidden');
-            
-            // Load view-specific content
-            if (viewName === 'analyticsView') {
+        // Load view-specific content with delay for rendering
+        setTimeout(() => {
+            if (viewId === 'analyticsView') {
+                console.log('Loading analytics...');
                 loadAnalytics();
-            } else if (viewName === 'historyView') {
+            } else if (viewId === 'historyView') {
+                console.log('Loading history...');
                 loadHistory();
             }
-        }
+        }, 100);
+    } else {
+        console.error('View not found:', viewId);
     }
 }
 
@@ -91,7 +106,10 @@ function setupEventListeners() {
         switchView('analyticsView');
         // Update nav active state
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        document.querySelector('[data-page="analytics"]').classList.add('active');
+        const analyticsNavLink = document.querySelector('[data-page="analytics"]');
+        if (analyticsNavLink) {
+            analyticsNavLink.classList.add('active');
+        }
     });
     exportBtn.addEventListener('click', showExport);
     
@@ -551,7 +569,12 @@ function updateAnalyticsStats() {
 
 function createSentimentChart() {
     const ctx = document.getElementById('sentimentChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.error('sentimentChart canvas not found');
+        return;
+    }
+    
+    console.log('Creating sentiment chart...');
     
     if (charts.sentiment) {
         charts.sentiment.destroy();
@@ -563,9 +586,9 @@ function createSentimentChart() {
             labels: ['Positive', 'Negative', 'Neutral'],
             datasets: [{
                 data: [
-                    conversationData.sentiments.positive,
-                    conversationData.sentiments.negative,
-                    conversationData.sentiments.neutral
+                    conversationData.sentiments.positive || 1,
+                    conversationData.sentiments.negative || 0,
+                    conversationData.sentiments.neutral || 0
                 ],
                 backgroundColor: ['#10b981', '#ef4444', '#808080'],
                 borderWidth: 0
@@ -585,11 +608,18 @@ function createSentimentChart() {
             }
         }
     });
+    
+    console.log('Sentiment chart created');
 }
 
 function createIssuesChart() {
     const ctx = document.getElementById('issuesChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.error('issuesChart canvas not found');
+        return;
+    }
+    
+    console.log('Creating issues chart...');
     
     if (charts.issues) {
         charts.issues.destroy();
@@ -599,13 +629,17 @@ function createIssuesChart() {
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5);
     
+    // If no intents, show placeholder
+    const labels = intents.length > 0 ? intents.map(i => i[0].replace('_', ' ')) : ['No data'];
+    const data = intents.length > 0 ? intents.map(i => i[1]) : [1];
+    
     charts.issues = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: intents.map(i => i[0].replace('_', ' ')),
+            labels: labels,
             datasets: [{
                 label: 'Count',
-                data: intents.map(i => i[1]),
+                data: data,
                 backgroundColor: '#1736F5',
                 borderRadius: 8
             }]
@@ -624,19 +658,30 @@ function createIssuesChart() {
             }
         }
     });
+    
+    console.log('Issues chart created');
 }
 
 function createTimelineChart() {
     const ctx = document.getElementById('timelineChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.error('timelineChart canvas not found');
+        return;
+    }
+    
+    console.log('Creating timeline chart...');
     
     if (charts.timeline) {
         charts.timeline.destroy();
     }
     
-    // Group messages by time (last 10 messages)
-    const timeLabels = conversationData.messages.slice(-10).map((msg, idx) => `Msg ${idx + 1}`);
-    const timeData = conversationData.messages.slice(-10).map(() => 1);
+    // Group messages by time (last 10 messages or placeholder)
+    const messages = conversationData.messages.length > 0 
+        ? conversationData.messages.slice(-10) 
+        : [{user: 'Start', timestamp: new Date().toISOString()}];
+    
+    const timeLabels = messages.map((msg, idx) => `${idx + 1}`);
+    const timeData = messages.map(() => 1);
     
     charts.timeline = new Chart(ctx, {
         type: 'line',
@@ -665,6 +710,8 @@ function createTimelineChart() {
             }
         }
     });
+    
+    console.log('Timeline chart created');
 }
 
 function refreshAnalytics() {

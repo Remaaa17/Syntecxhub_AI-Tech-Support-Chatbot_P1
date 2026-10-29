@@ -22,6 +22,11 @@ body {
     height: 100vh;
 }
 
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
 /* ========================================
    Side Navigation Bar
    ======================================== */
