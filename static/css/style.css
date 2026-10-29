@@ -7,14 +7,14 @@
 }
 
 :root {
-    --primary: #4F46E5;
-    --primary-dark: #4338CA;
-    --secondary: #10B981;
-    --bg-main: #F9FAFB;
+    --primary: #1736F5;
+    --primary-dark: #0E1F99;
+    --secondary: #FFC709;
+    --bg-main: #DEDEDE;
     --bg-card: #FFFFFF;
     --text-primary: #111827;
-    --text-secondary: #6B7280;
-    --border: #E5E7EB;
+    --text-secondary: #808080;
+    --border: #DEDEDE;
     --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
@@ -153,13 +153,13 @@ body {
 }
 
 .bot-avatar {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: linear-gradient(135deg, #1736F5, #0E1F99);
     color: white;
 }
 
 .user-avatar {
-    background: var(--secondary);
-    color: white;
+    background: #FFC709;
+    color: #111827;
 }
 
 .message-content {
@@ -220,18 +220,18 @@ body {
 }
 
 .sentiment-positive {
-    background: #D1FAE5;
-    color: #065F46;
+    background: #E8F4FF;
+    color: #1736F5;
 }
 
 .sentiment-negative {
-    background: #FEE2E2;
-    color: #991B1B;
+    background: #FFF4E0;
+    color: #FF6B00;
 }
 
 .sentiment-neutral {
-    background: #E5E7EB;
-    color: #374151;
+    background: #F0F0F0;
+    color: #808080;
 }
 
 /* Input Container */
